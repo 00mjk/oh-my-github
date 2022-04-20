@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS omg_repo (
     `size` integer
 );
 
+CREATE INDEX IF NOT EXISTS idx_created_at ON omg_repo (created_at);
 CREATE INDEX IF NOT EXISTS idx_pushed_at ON omg_repo (pushed_at);
 CREATE INDEX IF NOT EXISTS idx_lang ON omg_repo (lang);
 
@@ -31,6 +32,19 @@ CREATE TABLE IF NOT EXISTS omg_my_repo (
 );
 
 CREATE INDEX IF NOT EXISTS idx_starred ON omg_my_star (starred_at);
+
+CREATE TABLE IF NOT EXISTS omg_my_gist (
+    id text PRIMARY KEY,
+    files text NOT NULL,
+    public integer,
+    created_at text NOT NULL,
+    updated_at text NOT NULL,
+    description text,
+    comments integer,
+);
+
+CREATE INDEX IF NOT EXISTS idx_created_at ON omg_repo (created_at);
+CREATE INDEX IF NOT EXISTS idx_update_at ON omg_repo (update_at);
 
 CREATE VIEW IF NOT EXISTS omg_my_star_view AS
 SELECT

@@ -434,7 +434,7 @@ static omg_error save_my_repos(omg_context ctx, omg_repo_list repo_lst) {
   return NO_ERROR;
 }
 
-omg_error omg_sync_repos(omg_context ctx) {
+omg_error omg_sync_owned_repos(omg_context ctx) {
   size_t page_num = 1;
   while (true) {
 #ifdef OMG_TEST
@@ -539,8 +539,8 @@ static omg_repo repo_from_db(sqlite3_stmt *stmt) {
   return repo;
 }
 
-omg_error omg_query_repos(omg_context ctx, const char *keyword,
-                          const char *language, omg_repo_list *out) {
+omg_error omg_query_owned_repos(omg_context ctx, const char *keyword,
+                                const char *language, omg_repo_list *out) {
   auto_sqlite3_stmt stmt = NULL;
   omg_error err = prepare_query_sql(ctx, false, keyword, language, &stmt);
   if (!is_ok(err)) {
@@ -571,11 +571,11 @@ omg_error omg_query_repos(omg_context ctx, const char *keyword,
 /* GitHub stars */
 /****************/
 
-omg_star omg_new_star() {
+omg_star omg_new_starred_repo() {
   return (omg_star){.starred_at = NULL, .repo = omg_new_repo()};
 }
 
-void omg_free_star(omg_star *star) {
+void omg_free_starred_repo(omg_star *star) {
   if (star) {
 #ifdef VERBOSE
     printf("free omg_star, starred_at is %s\n", star->starred_at);
@@ -585,18 +585,18 @@ void omg_free_star(omg_star *star) {
   }
 }
 
-omg_star_list omg_new_star_list() {
+omg_star_list omg_new_starred_repo_list() {
   return (omg_star_list){.star_array = NULL, .length = 0};
 }
 
-void omg_free_star_list(omg_star_list *star_list) {
+void omg_free_starred_repo_list(omg_star_list *star_list) {
   if (star_list) {
 #ifdef VERBOSE
     printf("free omg_star_list, length is %zu\n", star_list->length);
 #endif
 
     for (size_t i = 0; i < star_list->length; i++) {
-      omg_free_star(&(star_list->star_array[i]));
+      omg_free_starred_repo(&(star_list->star_array[i]));
     }
     free(star_list->star_array);
   }
@@ -626,8 +626,9 @@ static omg_error fetch_stars_by_page(omg_context ctx, size_t page_num,
   return NO_ERROR;
 }
 
-omg_error omg_query_stars(omg_context ctx, const char *keyword,
-                          const char *language, omg_star_list *out_lst) {
+omg_error omg_query_starred_repos(omg_context ctx, const char *keyword,
+                                  const char *language,
+                                  omg_star_list *out_lst) {
   auto_sqlite3_stmt stmt = NULL;
   omg_error err = prepare_query_sql(ctx, true, keyword, language, &stmt);
   if (!is_ok(err)) {
@@ -718,7 +719,7 @@ static omg_error save_my_stars(omg_context ctx, omg_star_list star_lst) {
   return NO_ERROR;
 }
 
-omg_error omg_sync_stars(omg_context ctx) {
+omg_error omg_sync_starred_repos(omg_context ctx) {
   size_t page_num = 1;
   while (true) {
 #ifdef OMG_TEST
@@ -744,7 +745,7 @@ omg_error omg_sync_stars(omg_context ctx) {
   return NO_ERROR;
 }
 
-omg_error omg_unstar(omg_context ctx, size_t repo_id) {
+omg_error omg_unstar_repo(omg_context ctx, size_t repo_id) {
   const char *sql = "delete from omg_repo where id = ? returning full_name";
   auto_sqlite3_stmt stmt = NULL;
   int rc = sqlite3_prepare_v2(ctx->db, sql, strlen(sql), &stmt, NULL);

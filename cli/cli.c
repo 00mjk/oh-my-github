@@ -21,13 +21,13 @@ int main(int argc, char **argv) {
     print_error(err);
     return 1;
   }
-  err = omg_sync_stars(ctx);
+  err = omg_sync_starred_repos(ctx);
   if (!is_ok(err)) {
     print_error(err);
     return 1;
   }
 
-  err = omg_sync_repos(ctx);
+  err = omg_sync_owned_repos(ctx);
   if (!is_ok(err)) {
     print_error(err);
     return 1;

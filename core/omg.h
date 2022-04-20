@@ -33,7 +33,7 @@ void omg_free_context(omg_context *ctx);
 #define omg_auto_context omg_context __attribute__((cleanup(omg_free_context)))
 
 // repo
-typedef struct omg_repo {
+typedef struct {
   int id;
   const char *full_name;
   const char *description;
@@ -53,7 +53,7 @@ omg_repo omg_new_repo();
 void omg_free_repo(omg_repo *repo);
 #define omg_auto_repo omg_repo __attribute__((cleanup(omg_free_repo)))
 
-typedef struct omg_repo_list {
+typedef struct {
   omg_repo *repo_array;
   size_t length;
 } omg_repo_list;
@@ -63,34 +63,60 @@ void omg_free_repo_list(omg_repo_list *repo_lst);
 #define omg_auto_repo_list                                                     \
   omg_repo_list __attribute__((cleanup(omg_free_repo_list)))
 
-omg_error omg_sync_repos(omg_context ctx);
-omg_error omg_query_repos(omg_context ctx, const char *keyword,
-                          const char *language, omg_repo_list *out);
+omg_error omg_sync_owned_repos(omg_context ctx);
+omg_error omg_query_owned_repos(omg_context ctx, const char *keyword,
+                                const char *language, omg_repo_list *out);
 
 // star
-typedef struct omg_star {
+typedef struct {
   char *starred_at;
   omg_repo repo;
-} omg_star;
+} omg_starred_repo;
 
-omg_star omg_new_star();
-void omg_free_star(omg_star *star);
-#define omg_auto_star omg_star __attribute__((cleanup(omg_free_star)))
+omg_starred_repo omg_new_starred_repo();
+void omg_free_starred_repo(omg_starred_repo *star);
+#define omg_auto_starred_repo                                                  \
+  omg_starred_repo __attribute__((cleanup(omg_free_starred_repo)))
 
-typedef struct omg_star_list {
-  omg_star *star_array;
+typedef struct {
+  omg_starred_repo *star_array;
   size_t length;
-} omg_star_list;
+} omg_starred_repo_list;
 
-omg_star_list omg_new_star_list();
-void omg_free_star_list(omg_star_list *);
-#define omg_auto_star_list                                                     \
-  omg_star_list __attribute__((cleanup(omg_free_star_list)))
+omg_starred_repo_list omg_new_starred_repo_list();
+void omg_free_starred_repo_list(omg_starred_repo_list *);
+#define omg_auto_starred_repo_list                                             \
+  omg_starred_repo_list __attribute__((cleanup(omg_free_starred_repo_list)))
 
-omg_error omg_query_stars(omg_context ctx, const char *keyword,
-                          const char *language, omg_star_list *out);
-omg_error omg_sync_stars(omg_context ctx);
-omg_error omg_unstar(omg_context ctx, size_t repo_id);
+omg_error omg_query_starred_repos(omg_context ctx, const char *keyword,
+                                  const char *language,
+                                  omg_starred_repo_list *out);
+omg_error omg_sync_starred_repos(omg_context ctx);
+omg_error omg_unstar_repo(omg_context ctx, size_t repo_id);
+
+typedef struct omg_gist_file {
+  char *filename;
+  char *type;
+  char *language;
+  char *raw_url;
+  int size;
+} omg_gist_file;
+
+typedef struct omg_gist {
+  char *id;
+  omg_gist_file *files;
+  size_t file_len;
+  bool public;
+  char *created_at;
+  char *updated_at;
+  char *description;
+  int comments;
+} omg_gist;
+
+omg_error omg_query_owned_gists(omg_context ctx, const char *keyword,
+                                const char *language,
+                                omg_starred_repo_list *out);
+omg_error omg_sync_owned_gists(omg_context ctx);
 
 typedef struct omg_user {
   char *login;

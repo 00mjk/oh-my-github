@@ -66,14 +66,14 @@ const char *FEATURE_NAME = "omg-dyn";
 emacs_value eomg_sync_star(emacs_env *env, ptrdiff_t _nargs, emacs_value *_args,
                            void *data) {
   ENSURE_SETUP(env);
-  omg_error err = omg_sync_stars(ctx);
+  omg_error err = omg_sync_starred_repos(ctx);
   if (!is_ok(err)) {
     return lisp_funcall(env, "error", lisp_string(env, (char *)err.message));
   }
 
   ENSURE_NONLOCAL_EXIT(env);
 
-  err = omg_sync_repos(ctx);
+  err = omg_sync_owned_repos(ctx);
   if (!is_ok(err)) {
     return lisp_funcall(env, "error", lisp_string(env, (char *)err.message));
   }
@@ -163,7 +163,7 @@ emacs_value omg_dyn_query_repos(emacs_env *env, ptrdiff_t nargs,
 
   ENSURE_NONLOCAL_EXIT(env);
   omg_auto_repo_list repo_lst = omg_new_repo_list();
-  omg_error err = omg_query_repos(ctx, keyword, lang, &repo_lst);
+  omg_error err = omg_query_owned_repos(ctx, keyword, lang, &repo_lst);
   if (!is_ok(err)) {
     return lisp_funcall(env, "error", lisp_string(env, (char *)err.message));
   }
@@ -192,8 +192,8 @@ emacs_value omg_dyn_query_stars(emacs_env *env, ptrdiff_t nargs,
 
   ENSURE_NONLOCAL_EXIT(env);
 
-  omg_auto_star_list star_lst = omg_new_star_list();
-  omg_error err = omg_query_stars(ctx, keyword, lang, &star_lst);
+  omg_auto_star_list star_lst = omg_new_starred_repo_list();
+  omg_error err = omg_query_starred_repos(ctx, keyword, lang, &star_lst);
   if (!is_ok(err)) {
     return lisp_funcall(env, "error", lisp_string(env, (char *)err.message));
   }
@@ -219,7 +219,7 @@ emacs_value omg_dyn_unstar(emacs_env *env, ptrdiff_t nargs, emacs_value *args,
 
   ENSURE_NONLOCAL_EXIT(env);
 
-  omg_error err = omg_unstar(ctx, repo_id);
+  omg_error err = omg_unstar_repo(ctx, repo_id);
   if (!is_ok(err)) {
     return lisp_funcall(env, "error", lisp_string(env, (char *)err.message));
   }
@@ -230,14 +230,14 @@ emacs_value omg_dyn_unstar(emacs_env *env, ptrdiff_t nargs, emacs_value *args,
 emacs_value omg_dyn_sync(emacs_env *env, ptrdiff_t nargs, emacs_value *args,
                          void *data) {
   ENSURE_SETUP(env);
-  omg_error err = omg_sync_stars(ctx);
+  omg_error err = omg_sync_starred_repos(ctx);
   if (!is_ok(err)) {
     return lisp_funcall(env, "error", lisp_string(env, (char *)err.message));
   }
 
   ENSURE_NONLOCAL_EXIT(env);
 
-  err = omg_sync_repos(ctx);
+  err = omg_sync_owned_repos(ctx);
   if (!is_ok(err)) {
     return lisp_funcall(env, "error", lisp_string(env, (char *)err.message));
   }
